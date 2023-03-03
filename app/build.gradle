@@ -7,6 +7,16 @@ android {
     namespace 'com.example.cicddemo'
     compileSdk 33
 
+    // For release build
+    signingConfigs {
+        CICDDemoConfigs {
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+    }
+
     defaultConfig {
         applicationId "com.example.cicddemo"
         minSdk 24
@@ -17,12 +27,46 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
+    // Flavours release/qa/debug
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        qa {
+            debuggable true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+
     }
+
+    flavorDimensions "default"
+    productFlavors {
+        myCICDDemo {
+            dimension "default"
+            signingConfig signingConfigs.CICDDemoConfigs
+        }
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "debug") {
+            buildConfigField 'String', 'BASE_URL', "\"http://com.nrup.mygitactionsdemo/debug/GitActions/ApplicationService.svc/\""
+        } else if (variant.buildType.name == "qa") {
+            buildConfigField 'String', 'BASE_URL', "\"http://com.nrup.mygitactionsdemo/qa/GitActions/ApplicationService.svc/\""
+        } else {
+            buildConfigField 'String', 'BASE_URL', "\"http://com.nrup.mygitactionsdemo/release/GitActions/ApplicationService.svc/\""
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
