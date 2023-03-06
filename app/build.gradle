@@ -29,7 +29,6 @@ android {
 
 
     // Flavours release/qa/debug
-
     buildTypes {
         release {
             minifyEnabled true
